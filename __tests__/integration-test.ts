@@ -199,6 +199,22 @@ describe('Be able to delete properties', () => {
       // delete proxiedResource[predicate.value];
       // expect(predicate.value in proxiedResource).toEqual(false);
     }
+    for (const predicate of proxiedResource?.predicates ?? []) {
+      // expect(predicate.value in proxiedResource).toEqual(true);
+      delete proxiedResource[predicate.value];
+      expect(predicate.value in proxiedResource).toEqual(false);
+    }
+  });
+  it('Each property should be able to be delete without weird side effects', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triples());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+
+    for (const predicate of proxiedResource?.predicates ?? []) {
+      expect(predicate.value in proxiedResource).toEqual(true);
+      delete proxiedResource[predicate.value];
+      expect(predicate.value in proxiedResource).toEqual(false);
+    }
   });
 });
 
