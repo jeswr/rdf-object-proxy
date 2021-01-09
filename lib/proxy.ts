@@ -2,6 +2,8 @@ import { Resource } from 'rdf-object';
 import { ProxiedResource } from './types/ProxiedResource';
 import { ResourceSet } from './types/ResourceSet';
 
+// TODO: Refactor so only dealing with the list of resources?
+
 // eslint-disable-next-line no-unused-vars
 function get<T extends string>({ resource, resources }: ResourceSet, prop: SymbolConstructor['iterator']): () => Generator<ProxiedResource<T>, void, unknown>;
 // eslint-disable-next-line no-unused-vars, no-redeclare
@@ -44,5 +46,26 @@ export default function RdfObjectProxyFactory<T extends string>(
 ): ProxiedResource<T> {
   return new Proxy({ resource, resources }, {
     get,
+    set(target: ResourceSet, p, value) {
+      // @ts-ignore
+      return (target.resource.property[p] = value);
+    },
+    deleteProperty(target, p) {
+      try {
+        for (const res of target.resources) {
+          // @ts-ignore
+          delete res.property[p];
+        }
+        // @ts-ignore
+        delete target.resource.property[p];
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    has(target, p) {
+      // @ts-ignore
+      return target.resources.some((rsrc) => rsrc.properties[p].length > 0);
+    },
   }) as unknown as ProxiedResource<T>;
 }
