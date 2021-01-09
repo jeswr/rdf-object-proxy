@@ -57,10 +57,10 @@ export default function RdfObjectProxyFactory<T extends string>(
         // @ts-ignore
         for (const res of target.resources) {
           // @ts-ignore
-          delete res.properties[p];
+          delete res.property[p];
         }
         // @ts-ignore
-        delete target.resource.properties[p];
+        delete target.resource.property[p];
         console.log('b');
         return true;
       } catch (e) {
