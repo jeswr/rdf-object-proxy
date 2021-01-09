@@ -1,8 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-undef */
-import { RdfObjectLoader } from 'rdf-object';
+import { RdfObjectLoader, Resource } from 'rdf-object';
 import { triple, namedNode, literal } from '@rdfjs/data-model';
 import { RdfObjectProxy } from '../lib';
+
+// TODO: testing push
+// TODO: Fix types when setting
 
 // Initialize our loader with a JSON-LD context
 const context = {
@@ -160,7 +163,7 @@ describe('Handling undefined properties', () => {
     }
     expect(labels).toEqual([]);
   });
-  it('Return empty iterator on undefined property', async () => {
+  it('Should be falsy when looking for non existent property', async () => {
     const myLoader = new RdfObjectLoader({ context });
     await myLoader.importArray(triples());
     const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
@@ -168,6 +171,34 @@ describe('Handling undefined properties', () => {
     expect(`${proxiedResource.left}`).toBeFalsy();
   });
 });
+
+describe('Be able to set properties', () => {
+  it('Each property should be able to be set', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triples());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+
+    for (const predicate of proxiedResource?.predicates ?? []) {
+      // @ts-ignore
+      proxiedResource[predicate.value] = new Resource({ term: literal('Name') });
+      expect(proxiedResource[predicate.value]).toEqual(new Resource({ term: literal('Name') }));
+    }
+  });
+});
+
+describe('Be able to delete properties', () => {
+  it('Each property should be able to be delete', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triples());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+
+    for (const predicate of proxiedResource?.predicates ?? []) {
+      delete proxiedResource[predicate.value];
+      expect(`${proxiedResource[predicate.value]}`).toEqual(undefined);
+    }
+  });
+});
+
 
 // const myLoader = new RdfObjectLoader({ context });
 
