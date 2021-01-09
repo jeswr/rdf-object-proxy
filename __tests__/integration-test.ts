@@ -193,8 +193,9 @@ describe('Be able to delete properties', () => {
     const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
 
     for (const predicate of proxiedResource?.predicates ?? []) {
+      expect(predicate.value in proxiedResource).toEqual(true);
       delete proxiedResource[predicate.value];
-      expect(`${proxiedResource[predicate.value]}`).toEqual(undefined);
+      expect(predicate.value in proxiedResource).toEqual(false);
     }
   });
 });

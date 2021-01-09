@@ -46,26 +46,24 @@ export default function RdfObjectProxyFactory<T extends string>(
     get,
     set(target: ResourceSet, p, value) {
       // @ts-ignore
-      return target.resource[p] = value;
-      console.log('setter called')
-      // return true;
+      return (target.resource.property[p] = value);
     },
     deleteProperty(target, p) {
+      console.log('delete property called', p);
       try {
+        console.log('a');
         // @ts-ignore
-        target.resource[p] = undefined;
+        delete target.resource.properties[p];
+        console.log('b');
         return true;
       } catch (e) {
         return false;
       }
-      // @ts-ignore
-      return target.resource[p] = undefined ? true : false;
-      console.log('deleteProperty called');
-      return false
     },
     has(target, p) {
-      console.log('has called')
-      return false
-    }
+      console.log('has called');
+      return target.resources.some((resource) => resource.properties.has(p));
+    },
+
   }) as unknown as ProxiedResource<T>;
 }
