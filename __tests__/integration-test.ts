@@ -226,33 +226,38 @@ describe('Be able to delete properties', () => {
 const triplesList = () => [
   triple(
     namedNode('http://example.org/myResource'),
-    namedNode('http://www.w3.org/2000/01/rdf-schema#rest'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
     blankNode('1'),
   ),
   triple(
     blankNode('1'),
-    namedNode('http://www.w3.org/2000/01/rdf-schema#rest'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
     blankNode('2'),
   ),
   triple(
     blankNode('2'),
-    namedNode('http://www.w3.org/2000/01/rdf-schema#rest'),
-    namedNode('http://www.w3.org/2000/01/rdf-schema#nil'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#nil'),
   ),
   triple(
     blankNode('1'),
-    namedNode('http://www.w3.org/2000/01/rdf-schema#first'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'),
     namedNode('http://example.org/ListElement1'),
   ),
   triple(
     blankNode('2'),
-    namedNode('http://www.w3.org/2000/01/rdf-schema#first'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'),
     namedNode('http://example.org/ListElement2'),
   ),
   triple(
     namedNode('http://example.org/ListElement1'),
     namedNode('http://www.w3.org/2000/01/rdf-schema#label'),
     literal('Label for element 1'),
+  ),
+  triple(
+    namedNode('http://example.org/myResource'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'),
+    namedNode('http://example.org/ListElement0'),
   ),
   triple(
     namedNode('http://example.org/ListElement2'),
@@ -268,10 +273,8 @@ describe('testing .list', () => {
     const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
     const { list } = proxiedResource;
     // expect.assertions(2);
-    console.log(proxiedResource)
-    expect(list?.[0]?.label).toEqual('Label for element 1');
-    expect(list?.[1]?.label).toEqual('Label for element 2');
-    expect(list?.[1]?.label).toEqual('Label for element 3');
+    expect(`${list?.[1]?.label}`).toEqual('Label for element 1');
+    expect(`${list?.[2]?.label}`).toEqual('Label for element 2');
   });
 });
 
