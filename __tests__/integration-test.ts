@@ -5,6 +5,7 @@ import {
   triple, namedNode, literal, blankNode,
 } from '@rdfjs/data-model';
 import { RdfObjectProxy } from '../lib';
+import type { Quad } from  'rdf-js';
 
 // TODO: testing push
 // TODO: Fix types when setting
@@ -235,6 +236,11 @@ describe('Be able to delete properties', () => {
 
 const triplesList = () => [
   triple(
+    namedNode('http://example.org/myResource2'),
+    namedNode('http://example.org/pointsto'),
+    blankNode('http://example.org/myResource'),
+  ),
+  triple(
     namedNode('http://example.org/myResource'),
     namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
     blankNode('1'),
@@ -285,6 +291,33 @@ describe('testing .list', () => {
     // expect.assertions(2);
     expect(`${list?.[1]?.label}`).toEqual('Label for element 1');
     expect(`${list?.[2]?.label}`).toEqual('Label for element 2');
+  });
+});
+
+describe('can extract data', () => {
+  it('Get Quads of resource [rdf-object lib onlty]', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = myLoader.resources['http://example.org/myResource'];
+    const quads: Quad[] = [];
+    const hash: Record<string, boolean> = {};
+    for (const quad of proxiedResource.toQuads()) {
+      const h = `${quad.subject.value}&${quad.predicate.value}&${quad.object.value}&${quad.graph.value}`;
+      if (!hash[h]) {
+        console.log(h)
+        quads.push(quad);
+        hash[h] = true;
+      }
+    }
+    expect(quads.length).toEqual(triplesList().length - 1);
+  });
+
+  it('Get Quads of resource', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    // console.log(proxiedResource.toQuads());
+    expect(proxiedResource.toQuads().length).toEqual(triplesList().length - 1);
   });
 });
 
