@@ -5,7 +5,6 @@ type OverridenResource = {
   [K in Exclude<keyof Resource, 'list'>]: Resource[K];
 }
 
-
 export type ProxiedResource<T extends string> = {
   [Symbol.iterator](): Iterator<ProxiedResource<T>>;
 } & {
@@ -14,7 +13,7 @@ export type ProxiedResource<T extends string> = {
   // TODO: Remove partial based on on2ts
 } & OverridenResource & {
   list?: ProxiedResource<T>[];
-}
+} & Resource['properties']
 
 // type Obj<T> = T extends keyof Resource ? Resource[T] : (ProxiedResource | undefined)
 

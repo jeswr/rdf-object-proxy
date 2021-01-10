@@ -188,6 +188,16 @@ describe('Be able to set properties', () => {
       expect(`${proxiedResource[predicate.value]}`).toEqual(`${new Resource({ term: literal('Name') })}`);
     }
   });
+  it('should maintain the addProperty API', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triples());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    proxiedResource.addProperty(
+      new Resource({ term: namedNode('http://xmlns.com/foaf/0.1/name') }),
+      new Resource({ term: literal('Name') }),
+    );
+    expect(`${proxiedResource.name}`).toEqual(`${new Resource({ term: literal('Name') })}`);
+  });
 });
 
 describe('Be able to delete properties', () => {

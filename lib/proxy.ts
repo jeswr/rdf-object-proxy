@@ -2,9 +2,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
 import { Resource } from 'rdf-object';
+import { namedNode } from '@rdfjs/data-model';
 import { ProxiedResource } from './types/ProxiedResource';
 import { ResourceSet } from './types/ResourceSet';
-import { namedNode } from '@rdfjs/data-model';
 
 function get<T extends string, K extends string>(resources: Resource[], p: SymbolConstructor['iterator']):
 () => Generator<ProxiedResource<T>, void, unknown>;
@@ -27,6 +27,15 @@ function get<T extends string, K extends string>(resources: Resource[], p: strin
       return undefined;
     }
     case 'string': {
+      // if (p === 'push') {
+      //   // @ts-ignore
+      //   return (elem: Resource) => {
+      //     for (const resource of resources) {
+      //       // @ts-ignore
+      //       resource.push(elem);
+      //     }
+      //   };
+      // }
       for (const resource of resources) {
         if (p in resource) {
           const result = resource[p as keyof Resource];
@@ -38,7 +47,6 @@ function get<T extends string, K extends string>(resources: Resource[], p: strin
           return result;
         }
       }
-      console.log(p)
       if (p === 'valueOf' && resources.length === 0) {
         // @ts-ignore
         return () => undefined;
@@ -68,9 +76,9 @@ export default function proxiedResource<T extends string>(resources: Resource | 
 ProxiedResource<T> {
   let r: Resource[] = [];
   if (Array.isArray(resources)) {
-    r = resources
+    r = resources;
   } else {
-    r = [resources]
+    r = [resources];
   }
   return new Proxy(r, {
     get,
