@@ -1,8 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-undef */
 import { RdfObjectLoader, Resource } from 'rdf-object';
-import { triple, namedNode, literal } from '@rdfjs/data-model';
+import {
+  triple, namedNode, literal, blankNode,
+} from '@rdfjs/data-model';
 import { RdfObjectProxy } from '../lib';
+import type { Quad } from  'rdf-js';
 
 // TODO: testing push
 // TODO: Fix types when setting
@@ -186,6 +189,16 @@ describe('Be able to set properties', () => {
       expect(`${proxiedResource[predicate.value]}`).toEqual(`${new Resource({ term: literal('Name') })}`);
     }
   });
+  it('should maintain the addProperty API', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triples());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    proxiedResource.addProperty(
+      new Resource({ term: namedNode('http://xmlns.com/foaf/0.1/name') }),
+      new Resource({ term: literal('Name') }),
+    );
+    expect(`${proxiedResource.name}`).toEqual(`${new Resource({ term: literal('Name') })}`);
+  });
 });
 
 describe('Be able to delete properties', () => {
@@ -218,6 +231,93 @@ describe('Be able to delete properties', () => {
       }
       hash[predicate.value] = true;
     }
+  });
+});
+
+const triplesList = () => [
+  triple(
+    namedNode('http://example.org/myResource2'),
+    namedNode('http://example.org/pointsto'),
+    blankNode('http://example.org/myResource'),
+  ),
+  triple(
+    namedNode('http://example.org/myResource'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
+    blankNode('1'),
+  ),
+  triple(
+    blankNode('1'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
+    blankNode('2'),
+  ),
+  triple(
+    blankNode('2'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#nil'),
+  ),
+  triple(
+    blankNode('1'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'),
+    namedNode('http://example.org/ListElement1'),
+  ),
+  triple(
+    blankNode('2'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'),
+    namedNode('http://example.org/ListElement2'),
+  ),
+  triple(
+    namedNode('http://example.org/ListElement1'),
+    namedNode('http://www.w3.org/2000/01/rdf-schema#label'),
+    literal('Label for element 1'),
+  ),
+  triple(
+    namedNode('http://example.org/myResource'),
+    namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#first'),
+    namedNode('http://example.org/ListElement0'),
+  ),
+  triple(
+    namedNode('http://example.org/ListElement2'),
+    namedNode('http://www.w3.org/2000/01/rdf-schema#label'),
+    literal('Label for element 2'),
+  ),
+];
+
+describe('testing .list', () => {
+  it('.list should return a proxied resources', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    const { list } = proxiedResource;
+    // expect.assertions(2);
+    expect(`${list?.[1]?.label}`).toEqual('Label for element 1');
+    expect(`${list?.[2]?.label}`).toEqual('Label for element 2');
+  });
+});
+
+describe('can extract data', () => {
+  it('Get Quads of resource [rdf-object lib onlty]', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = myLoader.resources['http://example.org/myResource'];
+    const quads: Quad[] = [];
+    const hash: Record<string, boolean> = {};
+    for (const quad of proxiedResource.toQuads()) {
+      const h = `${quad.subject.value}&${quad.predicate.value}&${quad.object.value}&${quad.graph.value}`;
+      if (!hash[h]) {
+        console.log(h)
+        quads.push(quad);
+        hash[h] = true;
+      }
+    }
+    expect(quads.length).toEqual(triplesList().length - 1);
+  });
+
+  it('Get Quads of resource', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    // console.log(proxiedResource.toQuads());
+    expect(proxiedResource.toQuads().length).toEqual(triplesList().length - 1);
   });
 });
 
