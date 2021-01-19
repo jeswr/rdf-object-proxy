@@ -45,7 +45,9 @@ function get<T extends string, K extends string>(resources: Resource[], p: strin
         return () => undefined;
       }
       const hash: Record<string, boolean> = {};
-      const results = resources.flatMap((resource) => resource.properties[p]).filter((elem) => {
+      const results: Resource[] = ([] as Resource[]).concat(...resources.map(
+        (resource) => resource.properties[p],
+      )).filter((elem) => {
         const stringified = elem.toString();
         if (hash[stringified]) {
           return false;
