@@ -295,7 +295,7 @@ describe('testing .list', () => {
 });
 
 describe('can extract data', () => {
-  it('Get Quads of resource [rdf-object lib onlty]', async () => {
+  it('Get Quads of resource [rdf-object lib only]', async () => {
     const myLoader = new RdfObjectLoader({ context });
     await myLoader.importArray(triplesList());
     const proxiedResource = myLoader.resources['http://example.org/myResource'];
