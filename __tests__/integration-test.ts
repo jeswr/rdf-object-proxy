@@ -4,8 +4,8 @@ import { RdfObjectLoader, Resource } from 'rdf-object';
 import {
   triple, namedNode, literal, blankNode,
 } from '@rdfjs/data-model';
+import type { Quad } from 'rdf-js';
 import { RdfObjectProxy } from '../lib';
-import type { Quad } from  'rdf-js';
 
 // TODO: testing push
 // TODO: Fix types when setting
