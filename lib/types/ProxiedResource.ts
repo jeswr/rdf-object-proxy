@@ -15,10 +15,4 @@ export type ProxiedResource<T extends string> = {
   list?: ProxiedResource<T>[];
 } & Resource['properties']
 
-// type Obj<T> = T extends keyof Resource ? Resource[T] : (ProxiedResource | undefined)
-
-// export type ProxiedResource = {
-//   [key in Exclude<string, keyof Resource>]: Obj<key>;
-// } & {
-//   [Symbol.iterator](): Iterator<ProxiedResource>;
-// }
+export type AnyResource = ProxiedResource<string>;
