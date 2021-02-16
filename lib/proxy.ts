@@ -42,7 +42,7 @@ function get<T extends string, K extends string>(resources: Resource[], p: strin
       }
       if (p === 'typeOf' && resources.length === 0) {
         // @ts-ignore
-        return () => undefined;
+        return () => 'undefined';
       }
       const hash: Record<string, boolean> = {};
       const results: Resource[] = ([] as Resource[]).concat(...resources.map(

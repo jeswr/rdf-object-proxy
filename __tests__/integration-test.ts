@@ -294,6 +294,36 @@ describe('testing .list', () => {
   });
 });
 
+describe('testing .valueOf', () => {
+  it('.list should return a proxied resources', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    const { list } = proxiedResource;
+    // expect.assertions(2);
+    expect(`${list?.[1]?.label.valueOf()}`).toEqual('Label for element 1');
+    expect(`${list?.[2]?.label.valueOf()}`).toEqual('Label for element 2');
+    // TODO [FUTURE]: GET THESE TESTS RUNNING
+    // expect(`${list?.[1]?.nonExistantPredicate.valueOf()}`).toEqual(undefined);
+    // expect(`${list?.[2]?.nonExistantPredicate.valueOf()}`).toEqual(undefined);
+  });
+});
+
+describe('testing .typeof', () => {
+  it('.list should return a proxied resources', async () => {
+    const myLoader = new RdfObjectLoader({ context });
+    await myLoader.importArray(triplesList());
+    const proxiedResource = RdfObjectProxy(myLoader.resources['http://example.org/myResource']);
+    const { list } = proxiedResource;
+    // expect.assertions(2);
+    expect(`${list?.[1]?.label.type}`).toEqual('Literal');
+    expect(`${list?.[2]?.label.type}`).toEqual('Literal');
+
+    expect(`${list?.[1]?.nonExistantPredicate.type}`).toEqual('undefined');
+    expect(`${list?.[2]?.nonExistantPredicate.type}`).toEqual('undefined');
+  });
+});
+
 describe('can extract data', () => {
   it('Get Quads of resource [rdf-object lib only]', async () => {
     const myLoader = new RdfObjectLoader({ context });
