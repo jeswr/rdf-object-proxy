@@ -49,12 +49,17 @@
   "jest": {
     "preset": "ts-jest",
     "collectCoverage": true,
+    "coverageReporters": [
+      "json-summary", 
+      "text",
+      "lcov"
+    ],
     "coverageThreshold": {
       "global": {
-        "branches": 100,
-        "functions": 100,
-        "lines": 100,
-        "statements": 100
+        "branches": 85,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
       }
     }
   },
@@ -65,7 +70,17 @@
   ],
   "release": {
     "branches": [
-      "main"
+      "main",
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "next",
+      {
+        "name": "alpha",
+        "prerelease": true
+      },
+      {
+        "name": "beta",
+        "prerelease": true
+      }
     ]
   },
   "dependencies": {

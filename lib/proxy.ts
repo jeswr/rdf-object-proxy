@@ -1,10 +1,9 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
+/* eslint-disable no-redeclare */
 import { Resource } from 'rdf-object';
-import { namedNode } from '@rdfjs/data-model';
 import { ProxiedResource } from './types/ProxiedResource';
-import { ResourceSet } from './types/ResourceSet';
 
 function get<T extends string, K extends string>(resources: Resource[], p: SymbolConstructor['iterator']):
 () => Generator<ProxiedResource<T>, void, unknown>;
@@ -17,25 +16,15 @@ function get<T extends string, K extends string>(resources: Resource[], p: strin
   switch (typeof p) {
     case 'symbol': {
       if (p === Symbol.iterator) {
-        return function* () {
+        return function* generate() {
           for (const resource of resources) {
             yield proxiedResource(resource);
           }
-          // yield* resources.map((resource) => proxiedResource(resource));
         };
       }
       return undefined;
     }
     case 'string': {
-      // if (p === 'push') {
-      //   // @ts-ignore
-      //   return (elem: Resource) => {
-      //     for (const resource of resources) {
-      //       // @ts-ignore
-      //       resource.push(elem);
-      //     }
-      //   };
-      // }
       for (const resource of resources) {
         if (p in resource) {
           const result = resource[p as keyof Resource];
@@ -53,10 +42,12 @@ function get<T extends string, K extends string>(resources: Resource[], p: strin
       }
       if (p === 'typeOf' && resources.length === 0) {
         // @ts-ignore
-        return () => undefined;
+        return () => 'undefined';
       }
       const hash: Record<string, boolean> = {};
-      const results = resources.flatMap((resource) => resource.properties[p]).filter((elem) => {
+      const results: Resource[] = ([] as Resource[]).concat(...resources.map(
+        (resource) => resource.properties[p],
+      )).filter((elem) => {
         const stringified = elem.toString();
         if (hash[stringified]) {
           return false;
