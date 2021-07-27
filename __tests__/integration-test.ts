@@ -4,7 +4,7 @@ import { RdfObjectLoader, Resource } from 'rdf-object';
 import {
   triple, namedNode, literal, blankNode,
 } from '@rdfjs/data-model';
-import type { Quad } from 'rdf-js';
+import type { BaseQuad } from 'rdf-js';
 import { RdfObjectProxy } from '../lib';
 
 // TODO: testing push
@@ -329,7 +329,7 @@ describe('can extract data', () => {
     const myLoader = new RdfObjectLoader({ context });
     await myLoader.importArray(triplesList());
     const proxiedResource = myLoader.resources['http://example.org/myResource'];
-    const quads: Quad[] = [];
+    const quads: BaseQuad[] = [];
     const hash: Record<string, boolean> = {};
     for (const quad of proxiedResource.toQuads()) {
       const h = `${quad.subject.value}&${quad.predicate.value}&${quad.object.value}&${quad.graph.value}`;
