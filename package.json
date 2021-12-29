@@ -84,7 +84,7 @@
     ]
   },
   "dependencies": {
-    "@rdfjs/data-model": "^1.2.0",
+    "@rdfjs/data-model": "^2.0.0",
     "rdf-object": "^1.8.0"
   }
 }
